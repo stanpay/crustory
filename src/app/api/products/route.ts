@@ -53,6 +53,17 @@ export async function POST(req: Request) {
     if (e instanceof Error && e.message === "UNAUTHORIZED") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    if (e instanceof z.ZodError) {
+      return NextResponse.json({ error: e.issues[0]?.message || "입력값 오류" }, { status: 400 });
+    }
+    if (
+      e &&
+      typeof e === "object" &&
+      "code" in e &&
+      (e as { code?: string }).code === "P2002"
+    ) {
+      return NextResponse.json({ error: "이미 사용 중인 슬러그입니다." }, { status: 409 });
+    }
     console.error(e);
     return NextResponse.json({ error: "상품 등록 실패" }, { status: 500 });
   }

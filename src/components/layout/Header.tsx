@@ -27,6 +27,7 @@ export function Header() {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -34,6 +35,23 @@ export function Header() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadMe() {
+      try {
+        const res = await fetch("/api/auth/me");
+        const data = await res.json();
+        if (!cancelled) setUserName(data.user?.name || data.user?.email || null);
+      } catch {
+        if (!cancelled) setUserName(null);
+      }
+    }
+    void loadMe();
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname]);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -63,6 +81,15 @@ export function Header() {
         </Link>
 
         <div className="hd__util">
+          {userName ? (
+            <Link href="/order/lookup" className="hide-sm">
+              {userName}
+            </Link>
+          ) : (
+            <Link href="/login" className="hide-sm">
+              로그인
+            </Link>
+          )}
           <Link href="/order/lookup" className="hide-sm">
             주문조회
           </Link>
@@ -111,6 +138,11 @@ export function Header() {
             ))}
           </ul>
           <div className="menu__foot">
+            {userName ? (
+              <Link href="/order/lookup" onClick={() => setOpen(false)}>{userName} · 내 주문</Link>
+            ) : (
+              <Link href="/login" onClick={() => setOpen(false)}>카카오 로그인</Link>
+            )}
             <Link href="/order/lookup" onClick={() => setOpen(false)}>주문조회</Link>
             <Link href="/contact" onClick={() => setOpen(false)}>문의하기</Link>
             <Link href="/policies/guide" onClick={() => setOpen(false)}>이용안내</Link>

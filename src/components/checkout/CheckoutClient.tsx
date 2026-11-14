@@ -41,6 +41,7 @@ export function CheckoutClient() {
     shippingAddress: "",
     shippingMemo: "",
   });
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const shippingFee = total >= 50000 || total === 0 ? 0 : 3000;
   const payAmount = total + shippingFee;
@@ -57,6 +58,29 @@ export function CheckoutClient() {
       router.replace("/cart");
     }
   }, [ready, items.length, router]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadMe() {
+      try {
+        const res = await fetch("/api/auth/me");
+        const data = await res.json();
+        if (cancelled || !data.user) return;
+        setLoggedIn(true);
+        setForm((f) => ({
+          ...f,
+          customerName: f.customerName || data.user.name || "",
+          customerEmail: f.customerEmail || data.user.email || "",
+        }));
+      } catch {
+        // ignore
+      }
+    }
+    void loadMe();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // 1) SDK 초기화 (공식 샘플과 동일하게 분리)
   useEffect(() => {
@@ -212,6 +236,18 @@ export function CheckoutClient() {
       <div>
         <div className="panel">
           <h2>주문자·배송 정보</h2>
+          {loggedIn ? (
+            <p className="muted" style={{ marginBottom: "1rem" }}>
+              로그인 계정 정보가 자동으로 채워집니다. 결제 후 내 주문에서 확인할 수 있습니다.
+            </p>
+          ) : (
+            <p className="muted" style={{ marginBottom: "1rem" }}>
+              <a href={`/api/auth/kakao?next=${encodeURIComponent("/checkout")}`}>
+                카카오 로그인
+              </a>
+              하면 주문 조회가 더 편해집니다.
+            </p>
+          )}
           {(
             [
               ["customerName", "이름", "text"],

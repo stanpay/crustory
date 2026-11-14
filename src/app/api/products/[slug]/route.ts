@@ -15,8 +15,8 @@ export async function GET(_req: Request, ctx: Ctx) {
 }
 
 const patchSchema = z.object({
-  name: z.string().optional(),
-  description: z.string().optional(),
+  name: z.string().min(1).optional(),
+  description: z.string().min(1).optional(),
   price: z.number().int().nonnegative().optional(),
   stock: z.number().int().nonnegative().optional(),
   images: z.array(z.string()).optional(),
@@ -24,6 +24,7 @@ const patchSchema = z.object({
   options: z
     .array(z.object({ name: z.string(), values: z.array(z.string()) }))
     .optional(),
+  category: z.string().min(1).optional(),
   published: z.boolean().optional(),
   featured: z.boolean().optional(),
 });

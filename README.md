@@ -3,14 +3,15 @@
 제주 혼행객을 위한 F&B 라이프스타일 브랜드 **크러스토리** 공식 웹 프로토타입입니다.
 
 - Next.js App Router (웹 + API)
-- Prisma + SQLite
+- Prisma + Supabase Postgres
 - 토스페이먼츠 v2 주문서형 **샌드박스**
 
 ## 시작하기
 
 ```bash
 npm install
-npx prisma migrate dev
+cp .env.example .env   # Supabase DATABASE_URL / DIRECT_URL 입력
+npx prisma migrate deploy
 npx tsx prisma/seed.ts
 npm run dev
 ```
@@ -23,12 +24,27 @@ npm run dev
 
 | 키 | 설명 |
 |---|---|
-| `DATABASE_URL` | SQLite 경로 (`file:./dev.db`) |
+| `DATABASE_URL` | Supabase Transaction pooler (`:6543`, `pgbouncer=true`) |
+| `DIRECT_URL` | Supabase Session pooler (`:5432`) — 마이그레이션용 |
 | `NEXT_PUBLIC_TOSS_CLIENT_KEY` | 토스 위젯 테스트 클라이언트 키 (`test_gck_...`) |
 | `TOSS_SECRET_KEY` | 토스 시크릿 키 (`test_gsk_...`) — 서버 전용 |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | 관리자 계정 |
-| `ADMIN_SESSION_SECRET` | 세션 서명 시크릿 |
+| `ADMIN_SESSION_SECRET` | 관리자 세션 서명 시크릿 |
+| `CUSTOMER_SESSION_SECRET` | 회원 세션 서명 시크릿 |
+| `KAKAO_REST_API_KEY` | 카카오 REST API 키 |
+| `KAKAO_CLIENT_SECRET` | (선택) 카카오 Client Secret — 보안 설정에서 사용 시 |
+| `NEXT_PUBLIC_SITE_URL` | 사이트 URL (로컬 `http://localhost:3000`, 배포 시 Vercel URL) |
 | `NEXT_PUBLIC_GA_ID` | (선택) GA 측정 ID |
+
+### 카카오 로그인
+
+1. [카카오 개발자](https://developers.kakao.com)에서 앱 생성
+2. **플랫폼**에 사이트 도메인 등록 (`http://localhost:3000`, 배포 도메인)
+3. **Redirect URI**: `{NEXT_PUBLIC_SITE_URL}/api/auth/kakao/callback`
+4. **카카오 로그인** 활성화, 동의항목: 닉네임(필수), 이메일(선택)
+5. REST API 키를 `.env`의 `KAKAO_REST_API_KEY`에 넣기
+
+Vercel에는 위 변수를 Production에 등록하고, `NEXT_PUBLIC_SITE_URL`은 `https://crustory.vercel.app`으로 둡니다.
 
 시크릿 키에 `NEXT_PUBLIC_` 접두어를 붙이지 마세요.
 
@@ -59,6 +75,8 @@ npm run dev
 | `/shop` | 쇼핑몰 |
 | `/pizza` | 피자·매장 소개 |
 | `/jeju-guide` | 확장용 스텁 |
+| `/login` | 카카오 로그인 |
+| `/order/lookup` | 내 주문 / 주문 조회 |
 | `/admin` | 관리자 |
 
 ## 에셋 교체

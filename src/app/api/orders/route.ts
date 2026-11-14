@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getCustomerSession } from "@/lib/customer-auth";
 import { generateOrderId } from "@/lib/format";
 import { z } from "zod";
 
@@ -26,6 +27,7 @@ const schema = z.object({
 export async function POST(req: Request) {
   try {
     const body = schema.parse(await req.json());
+    const customer = await getCustomerSession();
 
     const products = await prisma.product.findMany({
       where: { id: { in: body.items.map((i) => i.productId) } },
@@ -74,7 +76,8 @@ export async function POST(req: Request) {
         customerPhone: body.customerPhone,
         shippingAddress: body.shippingAddress,
         shippingMemo: body.shippingMemo || null,
-        isGuest: true,
+        isGuest: !customer,
+        userId: customer?.id ?? null,
         status: "PENDING",
         items: {
           create: body.items.map((item) => ({

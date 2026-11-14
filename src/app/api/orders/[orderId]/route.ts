@@ -17,7 +17,7 @@ export async function GET(req: Request, ctx: Ctx) {
     return NextResponse.json({ error: "주문을 찾을 수 없습니다." }, { status: 404 });
   }
 
-  if (email && order.customerEmail.toLowerCase() !== email.toLowerCase()) {
+  if (!email || order.customerEmail.toLowerCase() !== email.toLowerCase()) {
     return NextResponse.json({ error: "정보가 일치하지 않습니다." }, { status: 403 });
   }
 

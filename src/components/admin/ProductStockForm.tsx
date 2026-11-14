@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -75,6 +76,11 @@ export function ProductStockForm({ product }: Props) {
           {saving ? "…" : "저장"}
         </button>
         {msg && <span style={{ marginLeft: 8, fontSize: "0.8rem" }}>{msg}</span>}
+      </td>
+      <td>
+        <Link href={`/admin/products/${product.slug}/edit`} className="btn btn-ghost">
+          수정
+        </Link>
       </td>
     </tr>
   );
