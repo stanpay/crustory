@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("admin@crustory.com");
   const [password, setPassword] = useState("crustoryadmin");
   const [error, setError] = useState("");
@@ -22,11 +20,10 @@ export default function AdminLoginPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "로그인 실패");
-      router.push("/admin");
-      router.refresh();
+      // Soft nav + refresh는 세션 쿠키 반영이 늦고 이중 fetch가 나서 전체 이동
+      window.location.assign("/admin");
     } catch (err) {
       setError(err instanceof Error ? err.message : "로그인 실패");
-    } finally {
       setLoading(false);
     }
   }

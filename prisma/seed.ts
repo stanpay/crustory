@@ -85,7 +85,7 @@ async function main() {
 
   const passwordHash = await bcrypt.hash(
     process.env.ADMIN_PASSWORD || "crustoryadmin",
-    10,
+    8,
   );
 
   await prisma.adminUser.create({

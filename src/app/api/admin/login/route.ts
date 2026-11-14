@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     if (!user) {
       return NextResponse.json({ error: "이메일 또는 비밀번호가 올바르지 않습니다." }, { status: 401 });
     }
-    await createAdminSession(user.id);
+    await createAdminSession(user);
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "로그인 실패" }, { status: 400 });
