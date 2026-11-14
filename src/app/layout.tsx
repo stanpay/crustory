@@ -20,11 +20,25 @@ export const metadata: Metadata = {
   },
   description:
     "혼자 온 여행을, 더 잘 즐길 수 있도록. 제주 혼행객을 위한 F&B 라이프스타일 브랜드 크러스토리.",
+  applicationName: "CRUSTORY",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   openGraph: {
     title: "CRUSTORY",
     description: "For solo travelers, from Jeju",
     locale: "ko_KR",
     type: "website",
+    siteName: "CRUSTORY",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CRUSTORY",
+    description: "For solo travelers, from Jeju",
   },
 };
 

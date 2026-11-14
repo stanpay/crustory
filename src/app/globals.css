@@ -208,11 +208,30 @@ select {
 }
 
 .wordmark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: clamp(22px, 3.2vw, 30px);
   font-weight: 800;
   letter-spacing: -0.055em;
   line-height: 1;
   text-transform: lowercase;
+  color: var(--ink);
+}
+
+.wordmark__svg {
+  width: auto;
+  height: 1em;
+  display: block;
+  overflow: visible;
+}
+
+.wordmark__text {
+  fill: currentColor;
+  font-family: var(--font-sans);
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.055em;
 }
 
 .wordmark sup {
@@ -220,6 +239,11 @@ select {
   font-weight: 600;
   margin-left: 1px;
   vertical-align: super;
+}
+
+/* keep plain-text wordmarks optically centered in header grid */
+a.wordmark {
+  justify-self: center;
 }
 
 .hd__util {

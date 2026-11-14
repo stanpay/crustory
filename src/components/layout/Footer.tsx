@@ -7,7 +7,9 @@ export function Footer() {
       <div className="wrap">
         <div className="ft__grid">
           <div className="ft__brand">
-            <p className="wordmark" style={{ margin: 0 }}>crustory</p>
+            <p className="wordmark" style={{ margin: 0 }}>
+              crustory
+            </p>
             <p>
               For solo travelers, from Jeju.
               <br />

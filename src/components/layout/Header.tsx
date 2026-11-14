@@ -114,7 +114,7 @@ export function Header() {
       {open && (
         <div className="menu" id="site-menu" role="dialog" aria-modal="true" aria-label="메뉴">
           <div className="menu__top">
-            <Link href="/" className="wordmark" onClick={() => setOpen(false)}>
+            <Link href="/" className="wordmark" onClick={() => setOpen(false)} aria-label="crustory 홈">
               crustory
             </Link>
             <button
