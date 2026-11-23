@@ -5,9 +5,6 @@ import { prisma } from "@/lib/prisma";
 
 const createSchema = z.object({
   title: z.string().trim().min(1),
-  body: z.string().trim().min(1),
-  linkHref: z.string().trim().optional().nullable(),
-  linkLabel: z.string().trim().optional().nullable(),
   active: z.boolean().optional(),
 });
 
@@ -43,9 +40,9 @@ export async function POST(req: Request) {
       return tx.notice.create({
         data: {
           title: body.title,
-          body: body.body,
-          linkHref: body.linkHref || null,
-          linkLabel: body.linkLabel || null,
+          body: "",
+          linkHref: null,
+          linkLabel: null,
           active,
         },
       });

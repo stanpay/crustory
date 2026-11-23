@@ -30,9 +30,6 @@ export default async function AdminEditNoticePage({ params }: Props) {
         noticeId={notice.id}
         initial={{
           title: notice.title,
-          body: notice.body,
-          linkHref: notice.linkHref ?? "",
-          linkLabel: notice.linkLabel ?? "",
           active: notice.active,
         }}
       />

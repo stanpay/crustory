@@ -27,7 +27,8 @@ export default async function AdminNoticesPage() {
             공지사항
           </h1>
           <p className="section-text">
-            상단 바에 노출할 공지를 작성·수정합니다. 노출 중인 공지는 하나만 유지됩니다.
+            상단 바에 노출할 공지를 마크다운으로 작성·수정합니다. 노출 중인 공지는 하나만
+            유지됩니다.
           </p>
         </div>
         <Link href="/admin/notices/new" className="btn btn-dark">
@@ -39,7 +40,6 @@ export default async function AdminNoticesPage() {
         <thead>
           <tr>
             <th>문구</th>
-            <th>링크</th>
             <th>노출</th>
             <th>수정일</th>
             <th>편집</th>
@@ -49,15 +49,6 @@ export default async function AdminNoticesPage() {
           {notices.map((n) => (
             <tr key={n.id}>
               <td>{n.title}</td>
-              <td>
-                {n.linkHref ? (
-                  <span>
-                    {n.linkLabel || "링크"} → {n.linkHref}
-                  </span>
-                ) : (
-                  "—"
-                )}
-              </td>
               <td>
                 <span className={`status-pill ${n.active ? "PAID" : "PENDING"}`}>
                   {n.active ? "노출" : "숨김"}
@@ -73,7 +64,7 @@ export default async function AdminNoticesPage() {
           ))}
           {notices.length === 0 && (
             <tr>
-              <td colSpan={5}>등록된 공지가 없습니다.</td>
+              <td colSpan={4}>등록된 공지가 없습니다.</td>
             </tr>
           )}
         </tbody>

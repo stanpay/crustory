@@ -1,26 +1,15 @@
-import Link from "next/link";
+import { MarkdownInline } from "@/components/MarkdownInline";
 
 export type Announcement = {
   title: string;
-  linkHref?: string | null;
-  linkLabel?: string | null;
 };
 
 export function AnnouncementBar({ announcement }: { announcement: Announcement | null }) {
-  if (!announcement?.title) return null;
-
-  const href = announcement.linkHref?.trim();
-  const label = announcement.linkLabel?.trim() || "자세히";
+  if (!announcement?.title?.trim()) return null;
 
   return (
     <div className="announce">
-      {announcement.title}
-      {href ? (
-        <>
-          {" "}
-          <Link href={href}>{label}</Link>
-        </>
-      ) : null}
+      <MarkdownInline source={announcement.title} />
     </div>
   );
 }

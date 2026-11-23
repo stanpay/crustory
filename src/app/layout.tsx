@@ -58,7 +58,7 @@ export default async function RootLayout({
   const activeNotice = await prisma.notice.findFirst({
     where: { active: true },
     orderBy: { updatedAt: "desc" },
-    select: { title: true, linkHref: true, linkLabel: true },
+    select: { title: true },
   });
 
   return (

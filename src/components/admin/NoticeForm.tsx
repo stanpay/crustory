@@ -3,12 +3,10 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { MarkdownInline } from "@/components/MarkdownInline";
 
 export type NoticeFormValues = {
   title: string;
-  body: string;
-  linkHref: string;
-  linkLabel: string;
   active: boolean;
 };
 
@@ -34,16 +32,12 @@ export function NoticeForm({ mode, noticeId, initial }: Props) {
     setMsg("");
     try {
       const title = values.title.trim();
-      const body = values.body.trim();
-      if (!title || !body) {
-        throw new Error("제목과 본문을 입력해 주세요.");
+      if (!title) {
+        throw new Error("상단 공지 문구를 입력해 주세요.");
       }
 
       const payload = {
         title,
-        body,
-        linkHref: values.linkHref.trim() || null,
-        linkLabel: values.linkLabel.trim() || null,
         active: values.active,
       };
 
@@ -90,52 +84,34 @@ export function NoticeForm({ mode, noticeId, initial }: Props) {
     }
   }
 
+  const previewTitle = values.title.trim();
+
   return (
     <form onSubmit={onSubmit} style={{ maxWidth: 720, marginTop: "1.25rem" }}>
       <div className="form-field">
         <label htmlFor="notice-title">상단 공지 문구</label>
-        <input
+        <textarea
           id="notice-title"
+          rows={4}
           value={values.title}
           onChange={(e) => setField("title", e.target.value)}
           required
-          placeholder="러니 여행노트 예약판매 중 · 5만원 이상 무료배송"
+          placeholder="러니 여행노트 예약판매 중 · [보러 가기](/shop?type=PREORDER)"
         />
         <p style={{ marginTop: 6, fontSize: "0.8rem", color: "#6b6560" }}>
-          사이트 상단 바에 그대로 표시됩니다.
+          마크다운으로 작성합니다. 예: <code>**굵게**</code>,{" "}
+          <code>[링크 문구](/shop)</code>
         </p>
       </div>
 
       <div className="form-field">
-        <label htmlFor="notice-body">상세 설명</label>
-        <textarea
-          id="notice-body"
-          rows={4}
-          value={values.body}
-          onChange={(e) => setField("body", e.target.value)}
-          required
-          placeholder="관리용 상세 설명"
-        />
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        <div className="form-field">
-          <label htmlFor="notice-link-href">링크 URL</label>
-          <input
-            id="notice-link-href"
-            value={values.linkHref}
-            onChange={(e) => setField("linkHref", e.target.value)}
-            placeholder="/shop?type=PREORDER"
-          />
-        </div>
-        <div className="form-field">
-          <label htmlFor="notice-link-label">링크 문구</label>
-          <input
-            id="notice-link-label"
-            value={values.linkLabel}
-            onChange={(e) => setField("linkLabel", e.target.value)}
-            placeholder="보러 가기"
-          />
+        <label>미리보기</label>
+        <div className="announce" style={{ marginTop: 6, borderRadius: 4 }}>
+          {previewTitle ? (
+            <MarkdownInline source={previewTitle} />
+          ) : (
+            <span style={{ opacity: 0.55 }}>공지 문구를 입력하면 여기에 표시됩니다.</span>
+          )}
         </div>
       </div>
 

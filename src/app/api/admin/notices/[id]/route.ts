@@ -7,9 +7,6 @@ type Ctx = { params: Promise<{ id: string }> };
 
 const patchSchema = z.object({
   title: z.string().trim().min(1).optional(),
-  body: z.string().trim().min(1).optional(),
-  linkHref: z.string().trim().optional().nullable(),
-  linkLabel: z.string().trim().optional().nullable(),
   active: z.boolean().optional(),
 });
 
@@ -34,10 +31,14 @@ export async function PATCH(req: Request, ctx: Ctx) {
       return tx.notice.update({
         where: { id },
         data: {
-          ...(body.title !== undefined ? { title: body.title } : {}),
-          ...(body.body !== undefined ? { body: body.body } : {}),
-          ...(body.linkHref !== undefined ? { linkHref: body.linkHref || null } : {}),
-          ...(body.linkLabel !== undefined ? { linkLabel: body.linkLabel || null } : {}),
+          ...(body.title !== undefined
+            ? {
+                title: body.title,
+                body: "",
+                linkHref: null,
+                linkLabel: null,
+              }
+            : {}),
           ...(body.active !== undefined ? { active: body.active } : {}),
         },
       });

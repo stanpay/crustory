@@ -84,10 +84,10 @@ async function main() {
 
   await prisma.notice.create({
     data: {
-      title: "러니 여행노트 예약판매 중 · 5만원 이상 무료배송",
-      body: "러니 여행노트 예약판매가 시작되었습니다. 순차 제작·발송됩니다.",
-      linkHref: "/shop?type=PREORDER",
-      linkLabel: "보러 가기",
+      title: "러니 여행노트 예약판매 중 · 5만원 이상 무료배송 · [보러 가기](/shop?type=PREORDER)",
+      body: "",
+      linkHref: null,
+      linkLabel: null,
       active: true,
     },
   });
