@@ -59,7 +59,7 @@ export default async function AdminDashboardPage() {
           <p style={{ fontSize: "1.75rem", fontWeight: 800, color: "#111" }}>{orderCount}</p>
         </article>
         <article className="value-card">
-          <h3>결제 합계</h3>
+          <h3>확정 주문 합계</h3>
           <p style={{ fontSize: "1.25rem", fontWeight: 800, color: "#111" }}>
             {formatPrice(paidTotal)}
           </p>

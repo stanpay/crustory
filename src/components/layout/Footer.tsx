@@ -28,8 +28,8 @@ export function Footer() {
           <div>
             <h2>고객 지원</h2>
             <ul>
-              <li><Link href="/order/lookup">주문조회</Link></li>
               <li><Link href="/contact">문의하기</Link></li>
+              <li><Link href="/account">계정</Link></li>
               <li><Link href="/policies/guide">이용안내</Link></li>
             </ul>
           </div>

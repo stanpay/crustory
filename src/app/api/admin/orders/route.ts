@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { notifyOrderStatus } from "@/lib/push";
 import { z } from "zod";
 
 export async function GET() {
@@ -25,10 +26,37 @@ export async function PATCH(req: Request) {
   try {
     await requireAdmin();
     const body = patchSchema.parse(await req.json());
-    const order = await prisma.order.update({
+
+    const existing = await prisma.order.findUnique({
       where: { orderId: body.orderId },
-      data: { status: body.status },
+      include: { items: true },
     });
+    if (!existing) {
+      return NextResponse.json({ error: "주문을 찾을 수 없습니다." }, { status: 404 });
+    }
+
+    const order = await prisma.$transaction(async (tx) => {
+      if (
+        body.status === "CANCELLED" &&
+        existing.status !== "CANCELLED" &&
+        existing.status !== "REFUNDED"
+      ) {
+        for (const item of existing.items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { increment: item.quantity } },
+          });
+        }
+      }
+
+      return tx.order.update({
+        where: { orderId: body.orderId },
+        data: { status: body.status },
+      });
+    });
+
+    void notifyOrderStatus(order).catch((err) => console.error("push failed", err));
+
     return NextResponse.json({ order });
   } catch (e) {
     if (e instanceof Error && e.message === "UNAUTHORIZED") {

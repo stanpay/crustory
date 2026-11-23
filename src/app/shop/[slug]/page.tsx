@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatPrice, parseImages } from "@/lib/format";
 import { runieNote } from "@/lib/runie-notes";
-import { AddToCartBuy } from "@/components/shop/AddToCartBuy";
+import { ProductInquiry } from "@/components/shop/ProductInquiry";
 import { DetailTabs } from "@/components/shop/DetailTabs";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { Runie } from "@/components/brand/Runie";
@@ -68,35 +68,23 @@ export default async function ProductDetailPage({ params }: Props) {
 
             {isPre && (
               <p className="pdp__notice">
-                <b>예약판매</b> 상품이에요. 제작이 끝나는 대로 주문 순서대로 보내드려요.
+                <b>예약판매</b> 예정 상품이에요. 판매·수령 일정은 문의로 안내드려요.
               </p>
             )}
 
-            <AddToCartBuy
-              product={{
-                id: product.id,
-                slug: product.slug,
-                name: product.name,
-                price: product.price,
-                image,
-                saleType: product.saleType,
-                options: product.options,
-                stock: product.stock,
-              }}
-            />
+            <ProductInquiry productName={product.name} />
 
             <DetailTabs
               tabs={[
                 {
-                  id: "ship",
-                  label: "배송 안내",
+                  id: "buy",
+                  label: "구매 안내",
                   content: (
                     <ul>
-                      <li>기본 배송비 3,000원, 50,000원 이상 무료배송</li>
+                      <li>현재 온라인 주문·결제는 제공하지 않습니다.</li>
                       <li>
-                        {isPre
-                          ? "예약판매 상품은 제작 완료 후 순차 출고됩니다."
-                          : "결제 확인 후 순차 출고됩니다."}
+                        상품 문의는 <Link href="/contact" style={{ textDecoration: "underline" }}>문의하기</Link>로
+                        남겨 주세요.
                       </li>
                     </ul>
                   ),
@@ -106,8 +94,7 @@ export default async function ProductDetailPage({ params }: Props) {
                   label: "교환·반품",
                   content: (
                     <ul>
-                      <li>상품 수령 후 7일 이내 문의해 주세요.</li>
-                      <li>단순 변심에 의한 교환·반품은 왕복 배송비가 발생합니다.</li>
+                      <li>오프라인·별도 안내로 구매한 경우에만 적용됩니다.</li>
                       <li>
                         자세한 내용은 <Link href="/policies/guide" style={{ textDecoration: "underline" }}>이용안내</Link>를 확인해 주세요.
                       </li>

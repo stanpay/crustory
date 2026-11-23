@@ -10,11 +10,20 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
     "db:reset": "prisma migrate reset --force",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "cap:sync": "npx cap sync android",
+    "android:open": "npx cap open android",
+    "android:debug": "npm run cap:sync && cd android && ./gradlew assembleDebug && mkdir -p ../dist && cp app/build/outputs/apk/debug/app-debug.apk ../dist/crustory-debug.apk",
+    "android:bundle": "npm run cap:sync && cd android && ./gradlew bundleRelease"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/browser": "^8.0.5",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/network": "^8.0.1",
+    "@capacitor/push-notifications": "^8.1.3",
+    "@capacitor/splash-screen": "^8.0.2",
     "@prisma/client": "^6.19.3",
-    "@tosspayments/tosspayments-sdk": "^2.10.0",
     "bcryptjs": "^3.0.3",
     "jose": "^6.2.17",
     "next": "16.4.6",
@@ -24,6 +33,8 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/cli": "^8.6.2",
     "@tailwindcss/turbopack": "4.3.3",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",

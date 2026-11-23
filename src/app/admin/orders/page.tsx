@@ -53,11 +53,7 @@ export default async function AdminOrdersPage() {
                 <span className={`status-pill ${o.status}`}>{o.status}</span>
               </td>
               <td>
-                <OrderActions
-                  orderId={o.orderId}
-                  status={o.status}
-                  hasPaymentKey={Boolean(o.paymentKey)}
-                />
+                <OrderActions orderId={o.orderId} status={o.status} />
               </td>
             </tr>
           ))}

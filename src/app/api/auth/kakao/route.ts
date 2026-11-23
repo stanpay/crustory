@@ -4,8 +4,8 @@ import { attachKakaoOAuthState } from "@/lib/customer-auth";
 import { buildKakaoAuthorizeUrl } from "@/lib/kakao";
 
 function safeNextPath(raw: string | null) {
-  if (!raw) return "/order/lookup";
-  if (!raw.startsWith("/") || raw.startsWith("//")) return "/order/lookup";
+  if (!raw) return "/";
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "/";
   return raw;
 }
 
@@ -14,10 +14,13 @@ export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const next = safeNextPath(url.searchParams.get("next"));
+    const fromApp =
+      url.searchParams.get("app") === "1" ||
+      /CrustoryApp|capacitor/i.test(req.headers.get("user-agent") || "");
     const stateToken = randomBytes(16).toString("hex");
     const authorizeUrl = buildKakaoAuthorizeUrl(stateToken);
     const res = NextResponse.redirect(authorizeUrl);
-    attachKakaoOAuthState(res, stateToken, next);
+    attachKakaoOAuthState(res, stateToken, next, fromApp);
     return res;
   } catch (e) {
     console.error(e);

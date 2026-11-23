@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useCart } from "@/components/cart/CartProvider";
 import { RunieEyes } from "@/components/brand/Runie";
 
 const nav = [
@@ -24,7 +23,6 @@ const menu = [
 
 export function Header() {
   const pathname = usePathname();
-  const { count } = useCart();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
@@ -82,7 +80,7 @@ export function Header() {
 
         <div className="hd__util">
           {userName ? (
-            <Link href="/order/lookup" className="hide-sm">
+            <Link href="/account" className="hide-sm">
               {userName}
             </Link>
           ) : (
@@ -90,11 +88,8 @@ export function Header() {
               로그인
             </Link>
           )}
-          <Link href="/order/lookup" className="hide-sm">
-            주문조회
-          </Link>
-          <Link href="/cart" className="hd__cart">
-            Cart<b className={count > 0 ? "has-items" : undefined}>{count}</b>
+          <Link href="/contact" className="hide-sm">
+            문의
           </Link>
         </div>
       </div>
@@ -139,14 +134,23 @@ export function Header() {
           </ul>
           <div className="menu__foot">
             {userName ? (
-              <Link href="/order/lookup" onClick={() => setOpen(false)}>{userName} · 내 주문</Link>
+              <Link href="/account" onClick={() => setOpen(false)}>
+                {userName} · 계정
+              </Link>
             ) : (
-              <Link href="/login" onClick={() => setOpen(false)}>카카오 로그인</Link>
+              <Link href="/login" onClick={() => setOpen(false)}>
+                카카오 로그인
+              </Link>
             )}
-            <Link href="/order/lookup" onClick={() => setOpen(false)}>주문조회</Link>
-            <Link href="/contact" onClick={() => setOpen(false)}>문의하기</Link>
-            <Link href="/policies/guide" onClick={() => setOpen(false)}>이용안내</Link>
-            <a href="https://www.instagram.com/crustory_jeju/" target="_blank" rel="noreferrer">Instagram</a>
+            <Link href="/contact" onClick={() => setOpen(false)}>
+              문의하기
+            </Link>
+            <Link href="/policies/guide" onClick={() => setOpen(false)}>
+              이용안내
+            </Link>
+            <a href="https://www.instagram.com/crustory_jeju/" target="_blank" rel="noreferrer">
+              Instagram
+            </a>
           </div>
         </div>
       )}

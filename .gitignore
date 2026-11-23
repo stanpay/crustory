@@ -51,3 +51,16 @@ next-env.d.ts
 # User-uploaded product images
 public/uploads/**
 !public/uploads/**/.gitkeep
+
+# Android / Capacitor secrets & build
+android/local.properties
+android/app/google-services.json
+android/keystore.properties
+android/keystore/
+android/app/build/
+android/.gradle/
+*.jks
+*.keystore
+
+# Local debug APK copies (rebuild with npm run android:debug)
+/dist/

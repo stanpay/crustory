@@ -8,7 +8,10 @@ import {
 import { exchangeKakaoCode, fetchKakaoProfile } from "@/lib/kakao";
 
 function siteBase() {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  return (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(
+    /\/$/,
+    "",
+  );
 }
 
 function redirectWithError(message: string) {
@@ -18,7 +21,7 @@ function redirectWithError(message: string) {
 }
 
 function safeNextPath(raw: string) {
-  if (!raw.startsWith("/") || raw.startsWith("//")) return "/order/lookup";
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "/";
   return raw;
 }
 
@@ -36,9 +39,11 @@ export async function GET(req: Request) {
       return redirectWithError("잘못된 로그인 요청입니다.");
     }
 
-    const { ok, nextPath } = await consumeKakaoOAuthState(state);
+    const { ok, nextPath, fromApp } = await consumeKakaoOAuthState(state);
     if (!ok) {
-      return redirectWithError("로그인 세션이 만료되었습니다. 다시 시도해 주세요.");
+      return redirectWithError(
+        "로그인 세션이 만료되었습니다. 다시 시도해 주세요.",
+      );
     }
 
     const token = await exchangeKakaoCode(code);
@@ -60,7 +65,17 @@ export async function GET(req: Request) {
     });
 
     const sessionToken = await createCustomerSessionToken(customer.id);
-    const res = NextResponse.redirect(`${siteBase()}${safeNextPath(nextPath)}`);
+    const safeNext = safeNextPath(nextPath);
+
+    // Android app: hand session back via custom scheme so WebView can set cookie.
+    if (fromApp) {
+      const deeplink =
+        `crustory://auth/callback?session=${encodeURIComponent(sessionToken)}` +
+        `&next=${encodeURIComponent(safeNext)}`;
+      return NextResponse.redirect(deeplink);
+    }
+
+    const res = NextResponse.redirect(`${siteBase()}${safeNext}`);
     attachCustomerSession(res, sessionToken);
     return res;
   } catch (e) {

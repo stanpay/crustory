@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Gowun_Batang } from "next/font/google";
-import { CartProvider } from "@/components/cart/CartProvider";
 import { Analytics } from "@/components/Analytics";
 import { SiteChrome } from "@/components/layout/SiteChrome";
+import { NativeAppBootstrap } from "@/components/native/NativeAppBootstrap";
 import "./globals.css";
 
 const gowun = Gowun_Batang({
@@ -58,9 +58,8 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <CartProvider>
-          <SiteChrome>{children}</SiteChrome>
-        </CartProvider>
+        <NativeAppBootstrap />
+        <SiteChrome>{children}</SiteChrome>
         <Analytics />
       </body>
     </html>

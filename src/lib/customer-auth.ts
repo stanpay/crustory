@@ -6,6 +6,7 @@ import { prisma } from "./prisma";
 const COOKIE_NAME = "crustory_customer";
 const STATE_COOKIE = "crustory_kakao_state";
 const NEXT_COOKIE = "crustory_kakao_next";
+const APP_COOKIE = "crustory_kakao_app";
 
 function getSecret() {
   const secret =
@@ -80,6 +81,7 @@ export function attachKakaoOAuthState(
   res: NextResponse,
   stateToken: string,
   nextPath: string,
+  fromApp = false,
 ) {
   res.cookies.set(STATE_COOKIE, stateToken, {
     ...cookieBase(),
@@ -89,16 +91,26 @@ export function attachKakaoOAuthState(
     ...cookieBase(),
     maxAge: 60 * 10,
   });
+  if (fromApp) {
+    res.cookies.set(APP_COOKIE, "1", {
+      ...cookieBase(),
+      maxAge: 60 * 10,
+    });
+  } else {
+    res.cookies.delete(APP_COOKIE);
+  }
 }
 
 export async function consumeKakaoOAuthState(expected: string | null) {
   const cookieStore = await cookies();
   const saved = cookieStore.get(STATE_COOKIE)?.value;
-  const nextPath = cookieStore.get(NEXT_COOKIE)?.value || "/order/lookup";
+  const nextPath = cookieStore.get(NEXT_COOKIE)?.value || "/";
+  const fromApp = cookieStore.get(APP_COOKIE)?.value === "1";
   cookieStore.delete(STATE_COOKIE);
   cookieStore.delete(NEXT_COOKIE);
+  cookieStore.delete(APP_COOKIE);
   if (!expected || !saved || saved !== expected) {
-    return { ok: false as const, nextPath: "/order/lookup" };
+    return { ok: false as const, nextPath: "/", fromApp: false };
   }
-  return { ok: true as const, nextPath };
+  return { ok: true as const, nextPath, fromApp };
 }

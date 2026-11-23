@@ -1,12 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
-export default function ContactPage() {
+function ContactInner() {
+  const params = useSearchParams();
+  const subject = params.get("subject");
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!subject) return;
+    setForm((f) =>
+      f.message ? f : { ...f, message: `[${subject}]\n` },
+    );
+  }, [subject]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,7 +43,9 @@ export default function ContactPage() {
       <header className="page-head" style={{ paddingTop: 0 }}>
         <h1>문의하기</h1>
       </header>
-      <p className="muted center" style={{ marginTop: -8, marginBottom: 32 }}>상품·배송·협업 문의를 남겨 주세요.</p>
+      <p className="muted center" style={{ marginTop: -8, marginBottom: 32 }}>
+        상품·매장·협업 문의를 남겨 주세요. 온라인 주문은 받지 않습니다.
+      </p>
 
       {done ? (
         <div className="panel">
@@ -77,5 +89,13 @@ export default function ContactPage() {
         </form>
       )}
     </div>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={<div className="wrap section">로딩 중…</div>}>
+      <ContactInner />
+    </Suspense>
   );
 }
