@@ -1,5 +1,4 @@
 import { PrismaClient, SaleType } from "@prisma/client";
-import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -76,30 +75,19 @@ async function main() {
   await prisma.order.deleteMany();
   await prisma.product.deleteMany();
   await prisma.notice.deleteMany();
-  await prisma.adminUser.deleteMany();
   await prisma.contactMessage.deleteMany();
+  // AdminUser는 Supabase에서 관리 — 시드가 지우지 않음
 
   for (const product of products) {
     await prisma.product.create({ data: product });
   }
 
-  const passwordHash = await bcrypt.hash(
-    process.env.ADMIN_PASSWORD || "crustoryadmin",
-    8,
-  );
-
-  await prisma.adminUser.create({
-    data: {
-      email: process.env.ADMIN_EMAIL || "admin@crustory.com",
-      passwordHash,
-      name: "CRUSTORY Admin",
-    },
-  });
-
   await prisma.notice.create({
     data: {
-      title: "러니 여행노트 예약판매 오픈",
+      title: "러니 여행노트 예약판매 중 · 5만원 이상 무료배송",
       body: "러니 여행노트 예약판매가 시작되었습니다. 순차 제작·발송됩니다.",
+      linkHref: "/shop?type=PREORDER",
+      linkLabel: "보러 가기",
       active: true,
     },
   });

@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import { Gowun_Batang } from "next/font/google";
 import { Analytics } from "@/components/Analytics";
+import { DevSiteBanner } from "@/components/layout/DevSiteBanner";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { NativeAppBootstrap } from "@/components/native/NativeAppBootstrap";
+import { getCustomerSession } from "@/lib/customer-auth";
+import { isDevSite } from "@/lib/env";
+import { prisma } from "@/lib/prisma";
 import "./globals.css";
 
 const gowun = Gowun_Batang({
@@ -42,11 +46,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const customer = await getCustomerSession();
+  const initialLoggedIn = Boolean(customer?.id);
+  const initialUserName = customer?.name || customer?.email || (initialLoggedIn ? "회원" : null);
+
+  const activeNotice = await prisma.notice.findFirst({
+    where: { active: true },
+    orderBy: { updatedAt: "desc" },
+    select: { title: true, linkHref: true, linkLabel: true },
+  });
+
   return (
     <html lang="ko" className={gowun.variable}>
       <head>
@@ -58,8 +72,15 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
+        {isDevSite() ? <DevSiteBanner /> : null}
         <NativeAppBootstrap />
-        <SiteChrome>{children}</SiteChrome>
+        <SiteChrome
+          initialLoggedIn={initialLoggedIn}
+          initialUserName={initialUserName}
+          announcement={activeNotice}
+        >
+          {children}
+        </SiteChrome>
         <Analytics />
       </body>
     </html>

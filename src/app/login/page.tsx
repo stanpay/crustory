@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 function LoginInner() {
   const params = useSearchParams();
   const error = params.get("error");
-  const next = params.get("next") || "/account";
+  const next = params.get("next") || "/";
   const href = `/api/auth/kakao?next=${encodeURIComponent(next)}`;
 
   return (
@@ -26,7 +26,7 @@ function LoginInner() {
           상품 문의는 로그인 없이도 <Link href="/contact">문의하기</Link>에서 가능합니다.
         </p>
         <p style={{ marginTop: "0.5rem", fontSize: "0.875rem" }}>
-          <Link href="/account">계정 삭제</Link>
+          <Link href="/account">회원탈퇴</Link>
         </p>
       </div>
     </div>

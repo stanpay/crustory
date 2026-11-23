@@ -2,6 +2,7 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
 import { prisma } from "./prisma";
+import { resolveLocalCustomer, shouldBypassAuth } from "./local-auth-bypass";
 
 const COOKIE_NAME = "crustory_customer";
 const STATE_COOKIE = "crustory_kakao_state";
@@ -59,6 +60,10 @@ export function clearCustomerSessionOn(res: NextResponse) {
 }
 
 export async function getCustomerSession() {
+  if (await shouldBypassAuth()) {
+    return resolveLocalCustomer();
+  }
+
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RunieEyes } from "@/components/brand/Runie";
 
@@ -21,11 +21,22 @@ const menu = [
   { href: "/jeju-guide", label: "Jeju Guide", note: "준비 중" },
 ];
 
-export function Header() {
+type HeaderProps = {
+  initialLoggedIn?: boolean;
+  initialUserName?: string | null;
+};
+
+export function Header({
+  initialLoggedIn = false,
+  initialUserName = null,
+}: HeaderProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [userName, setUserName] = useState<string | null>(null);
+  const [loggedIn, setLoggedIn] = useState(initialLoggedIn);
+  const [userName, setUserName] = useState<string | null>(initialUserName);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -38,11 +49,21 @@ export function Header() {
     let cancelled = false;
     async function loadMe() {
       try {
-        const res = await fetch("/api/auth/me");
+        const res = await fetch("/api/auth/me", { credentials: "same-origin" });
         const data = await res.json();
-        if (!cancelled) setUserName(data.user?.name || data.user?.email || null);
+        if (cancelled) return;
+        if (data.user?.id) {
+          setLoggedIn(true);
+          setUserName(data.user.name || data.user.email || "회원");
+        } else {
+          setLoggedIn(false);
+          setUserName(null);
+        }
       } catch {
-        if (!cancelled) setUserName(null);
+        if (!cancelled) {
+          setLoggedIn(false);
+          setUserName(null);
+        }
       }
     }
     void loadMe();
@@ -58,6 +79,26 @@ export function Header() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
+
+  async function handleLogout() {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+      setLoggedIn(false);
+      setUserName(null);
+      setOpen(false);
+      router.refresh();
+      if (pathname.startsWith("/account")) {
+        router.push("/");
+      }
+    } finally {
+      setLoggingOut(false);
+    }
+  }
 
   return (
     <header className={`hd${scrolled ? " is-scrolled" : ""}`}>
@@ -79,12 +120,17 @@ export function Header() {
         </Link>
 
         <div className="hd__util">
-          {userName ? (
-            <Link href="/account" className="hide-sm">
-              {userName}
-            </Link>
+          {loggedIn ? (
+            <button
+              type="button"
+              className="hd__auth-btn"
+              onClick={handleLogout}
+              disabled={loggingOut}
+            >
+              {loggingOut ? "…" : "로그아웃"}
+            </button>
           ) : (
-            <Link href="/login" className="hide-sm">
+            <Link href="/login" className="hd__auth-btn">
               로그인
             </Link>
           )}
@@ -133,10 +179,20 @@ export function Header() {
             ))}
           </ul>
           <div className="menu__foot">
-            {userName ? (
-              <Link href="/account" onClick={() => setOpen(false)}>
-                {userName} · 계정
-              </Link>
+            {loggedIn ? (
+              <>
+                <Link href="/account" onClick={() => setOpen(false)}>
+                  {userName || "회원"} · 계정
+                </Link>
+                <button
+                  type="button"
+                  className="menu__logout"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                >
+                  {loggingOut ? "…" : "로그아웃"}
+                </button>
+              </>
             ) : (
               <Link href="/login" onClick={() => setOpen(false)}>
                 카카오 로그인

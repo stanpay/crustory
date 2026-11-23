@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
+  attachAdminSession,
+  createAdminSessionToken,
+  resolveAdminFromKakao,
+} from "@/lib/auth";
+import {
   attachCustomerSession,
   consumeKakaoOAuthState,
   createCustomerSessionToken,
@@ -14,18 +19,26 @@ function siteBase() {
   );
 }
 
-function redirectWithError(message: string) {
+function isAdminNext(path: string) {
+  return path === "/admin" || path.startsWith("/admin/");
+}
+
+function redirectWithError(message: string, admin = false) {
+  const dest = admin ? "/admin/login" : "/login";
   return NextResponse.redirect(
-    `${siteBase()}/login?error=${encodeURIComponent(message)}`,
+    `${siteBase()}${dest}?error=${encodeURIComponent(message)}`,
   );
 }
 
 function safeNextPath(raw: string) {
   if (!raw.startsWith("/") || raw.startsWith("//")) return "/";
+  // 로그인 기본 랜딩은 메인
+  if (raw === "/login" || raw.startsWith("/login?")) return "/";
   return raw;
 }
 
 export async function GET(req: Request) {
+  let adminAttempt = false;
   try {
     const url = new URL(req.url);
     const code = url.searchParams.get("code");
@@ -40,14 +53,32 @@ export async function GET(req: Request) {
     }
 
     const { ok, nextPath, fromApp } = await consumeKakaoOAuthState(state);
+    const safeNext = safeNextPath(nextPath);
+    adminAttempt = isAdminNext(safeNext);
+
     if (!ok) {
       return redirectWithError(
         "로그인 세션이 만료되었습니다. 다시 시도해 주세요.",
+        adminAttempt,
       );
     }
 
     const token = await exchangeKakaoCode(code);
     const profile = await fetchKakaoProfile(token.access_token);
+
+    if (adminAttempt) {
+      const admin = await resolveAdminFromKakao(profile);
+      if (!admin) {
+        return redirectWithError(
+          "관리자로 등록된 카카오 계정이 아닙니다.",
+          true,
+        );
+      }
+      const sessionToken = await createAdminSessionToken(admin);
+      const res = NextResponse.redirect(`${siteBase()}${safeNext}`);
+      attachAdminSession(res, sessionToken);
+      return res;
+    }
 
     const customer = await prisma.customer.upsert({
       where: { kakaoId: profile.kakaoId },
@@ -65,7 +96,6 @@ export async function GET(req: Request) {
     });
 
     const sessionToken = await createCustomerSessionToken(customer.id);
-    const safeNext = safeNextPath(nextPath);
 
     // Android app: hand session back via custom scheme so WebView can set cookie.
     if (fromApp) {
@@ -80,6 +110,6 @@ export async function GET(req: Request) {
     return res;
   } catch (e) {
     console.error(e);
-    return redirectWithError("카카오 로그인에 실패했습니다.");
+    return redirectWithError("카카오 로그인에 실패했습니다.", adminAttempt);
   }
 }

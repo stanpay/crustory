@@ -3,7 +3,7 @@
 제주 혼행객을 위한 F&B 라이프스타일 브랜드 **크러스토리** 공식 웹·Android 앱입니다.
 
 - Next.js App Router (웹 + API)
-- Prisma + Supabase Postgres
+- Prisma + Supabase Postgres (프로젝트 하나 · DB 둘: `postgres` / `crustory_dev`)
 - Capacitor Android 셸 (스플래시·오프라인·카카오 딥링크·FCM 푸시)
 - Shop은 **상품 소개**만 — 온라인 장바구니·주문·결제 없음 (문의하기 사용)
 
@@ -11,7 +11,7 @@
 
 ```bash
 npm install
-cp .env.example .env   # Supabase DATABASE_URL / DIRECT_URL 입력
+cp .env.example .env   # 로컬은 crustory_dev URL 사용
 npx prisma migrate deploy
 npx tsx prisma/seed.ts
 npm run dev
@@ -19,15 +19,29 @@ npm run dev
 
 브라우저에서 [http://localhost:3000](http://localhost:3000) 을 엽니다.
 
+## 데이터베이스 (main / dev)
+
+같은 Supabase 프로젝트 안에 DB 두 개를 둡니다. 백엔드 서버는 분리하지 않고 **환경변수만** 바꿉니다.
+
+| 환경 | Git | DB |
+|---|---|---|
+| 로컬 `npm run dev` | — | `crustory_dev` |
+| Vercel Preview | `dev` 브랜치 | `crustory_dev` |
+| Vercel Production | `main` 브랜치 | `postgres` |
+
+Vercel에서는 Production / Preview 환경에 각각 다른 `DATABASE_URL`·`DIRECT_URL`을 넣습니다.  
+URL의 경로만 `/postgres` ↔ `/crustory_dev`로 바꾸면 됩니다.
+
+마이그레이션은 로컬(dev DB)에 먼저 적용한 뒤, Production 배포 시 main DB에 `npx prisma migrate deploy` 합니다.
+
 ## 환경 변수
 
 `.env.example`을 참고해 `.env`를 구성합니다.
 
 | 키 | 설명 |
 |---|---|
-| `DATABASE_URL` | Supabase Transaction pooler (`:6543`, `pgbouncer=true`) |
-| `DIRECT_URL` | Supabase Session pooler (`:5432`) — 마이그레이션용 |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | 관리자 계정 |
+| `DATABASE_URL` | Supabase Transaction pooler (`:6543`, `pgbouncer=true`) — 로컬/Preview는 `/crustory_dev` |
+| `DIRECT_URL` | Supabase Session pooler (`:5432`) — 마이그레이션용, DB 이름은 `DATABASE_URL`과 동일 |
 | `ADMIN_SESSION_SECRET` | 관리자 세션 서명 시크릿 |
 | `CUSTOMER_SESSION_SECRET` | 회원 세션 서명 시크릿 |
 | `KAKAO_REST_API_KEY` | 카카오 REST API 키 |
@@ -49,10 +63,11 @@ Vercel Production의 `NEXT_PUBLIC_SITE_URL`은 `https://crustory.vercel.app`으�
 
 ## 관리자
 
-- URL: `/admin/login` (웹 전용)
-- 기본 계정: `admin@crustory.com` / `crustoryadmin` (시드·`.env` 기준)
+- URL: `/admin/login` → **카카오 로그인**
+- 권한은 Supabase `AdminUser` 테이블의 `kakaoId`만 본다 (env에 ID를 두지 않음)
+- 등록: 사이트 카카오 로그인 후 `Customer.kakaoId` 확인 → Table Editor/`AdminUser`에 insert
 
-상품 공개 여부·재고 등을 관리할 수 있습니다. (온라인 주문 접수 UI는 고객용으로 비활성)
+상품 공개 여부·재고 등을 관리할 수 있습니다.
 
 ## 주요 경로
 
@@ -65,7 +80,7 @@ Vercel Production의 `NEXT_PUBLIC_SITE_URL`은 `https://crustory.vercel.app`으�
 | `/pizza` | 피자·매장 소개 |
 | `/contact` | 문의하기 |
 | `/login` | 카카오 로그인 |
-| `/account` | 계정 삭제 |
+| `/account` | 회원탈퇴 |
 | `/admin` | 관리자 (웹) |
 
 ## Android 앱

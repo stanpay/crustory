@@ -1,10 +1,26 @@
 import Link from "next/link";
 
-export function AnnouncementBar() {
+export type Announcement = {
+  title: string;
+  linkHref?: string | null;
+  linkLabel?: string | null;
+};
+
+export function AnnouncementBar({ announcement }: { announcement: Announcement | null }) {
+  if (!announcement?.title) return null;
+
+  const href = announcement.linkHref?.trim();
+  const label = announcement.linkLabel?.trim() || "자세히";
+
   return (
     <div className="announce">
-      러니 여행노트 예약판매 중 · 5만원 이상 무료배송{" "}
-      <Link href="/shop?type=PREORDER">보러 가기</Link>
+      {announcement.title}
+      {href ? (
+        <>
+          {" "}
+          <Link href={href}>{label}</Link>
+        </>
+      ) : null}
     </div>
   );
 }

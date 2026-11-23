@@ -66,9 +66,10 @@ export default async function AdminDashboardPage() {
         </article>
       </div>
 
-      <div style={{ marginTop: "2rem", display: "flex", gap: "0.75rem" }}>
+      <div style={{ marginTop: "2rem", display: "flex", flexWrap: "wrap", gap: "0.75rem" }}>
         <Link href="/admin/products" className="btn btn-dark">상품 관리</Link>
         <Link href="/admin/orders" className="btn btn-primary">주문 관리</Link>
+        <Link href="/admin/notices" className="btn btn-ghost">공지 관리</Link>
       </div>
 
       <h2 style={{ marginTop: "2.5rem" }}>최근 주문</h2>
