@@ -14,10 +14,24 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const file = formData.get("file");
 
-    if (!(file instanceof File)) {
+    // Next/undici에서 File instanceof 가 깨지는 경우가 있어 Blob 기준으로 판별
+    if (!file || typeof file === "string" || !(file instanceof Blob)) {
       return NextResponse.json({ error: "파일이 필요합니다." }, { status: 400 });
     }
-    if (!ALLOWED.has(file.type)) {
+
+    const originalName = file instanceof File ? file.name : "";
+    const mimeFromName = originalName.match(/\.png$/i)
+      ? "image/png"
+      : originalName.match(/\.webp$/i)
+        ? "image/webp"
+        : originalName.match(/\.gif$/i)
+          ? "image/gif"
+          : originalName.match(/\.(jpe?g)$/i)
+            ? "image/jpeg"
+            : "";
+    const mime = ALLOWED.has(file.type) ? file.type : mimeFromName || "image/jpeg";
+
+    if (!ALLOWED.has(mime)) {
       return NextResponse.json(
         { error: "jpg, png, webp, gif만 업로드할 수 있습니다." },
         { status: 400 },
@@ -28,22 +42,22 @@ export async function POST(req: Request) {
     }
 
     const ext =
-      file.type === "image/png"
+      mime === "image/png"
         ? "png"
-        : file.type === "image/webp"
+        : mime === "image/webp"
           ? "webp"
-          : file.type === "image/gif"
+          : mime === "image/gif"
             ? "gif"
             : "jpg";
 
-    const filename = `${Date.now()}-${randomUUID().slice(0, 8)}.${ext}`;
+    const savedName = `${Date.now()}-${randomUUID().slice(0, 8)}.${ext}`;
     const dir = path.join(process.cwd(), "public", "uploads", "products");
     await mkdir(dir, { recursive: true });
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(path.join(dir, filename), buffer);
+    await writeFile(path.join(dir, savedName), buffer);
 
-    return NextResponse.json({ url: `/uploads/products/${filename}` });
+    return NextResponse.json({ url: `/uploads/products/${savedName}` });
   } catch (e) {
     if (e instanceof Error && e.message === "UNAUTHORIZED") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

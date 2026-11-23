@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { formatPrice } from "@/lib/format";
+import { parseImages } from "@/lib/format";
 import { ProductStockForm } from "@/components/admin/ProductStockForm";
 
 export default async function AdminProductsPage() {
@@ -13,21 +13,13 @@ export default async function AdminProductsPage() {
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "space-between",
-          gap: "0.75rem",
-          alignItems: "flex-end",
-        }}
-      >
+      <div className="admin-page-head">
         <div>
-          <h1 className="section-title" style={{ fontSize: "1.75rem" }}>
+          <h1 className="section-title" style={{ fontSize: "clamp(1.35rem, 4vw, 1.75rem)" }}>
             상품 관리
           </h1>
           <p className="section-text">
-            목록에서 가격·재고·공개를 빠르게 바꾸거나, 수정으로 전체 정보를 편집할 수 있습니다.
+            카드를 누르면 수정 페이지로 이동합니다. 판매유형·공개·추천은 바로 반영되고, 재고는 확인을 눌러 저장합니다.
           </p>
         </div>
         <Link href="/admin/products/new" className="btn btn-dark">
@@ -35,34 +27,22 @@ export default async function AdminProductsPage() {
         </Link>
       </div>
 
-      <table className="admin-table" style={{ marginTop: "1.25rem" }}>
-        <thead>
-          <tr>
-            <th>상품</th>
-            <th>유형</th>
-            <th>가격</th>
-            <th>재고</th>
-            <th>공개</th>
-            <th>저장</th>
-            <th>편집</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((p) => (
-            <ProductStockForm
-              key={p.id}
-              product={{
-                slug: p.slug,
-                name: p.name,
-                saleType: p.saleType,
-                price: p.price,
-                stock: p.stock,
-                published: p.published,
-              }}
-            />
-          ))}
-        </tbody>
-      </table>
+      <div className="admin-product-list">
+        {products.map((p) => (
+          <ProductStockForm
+            key={p.id}
+            product={{
+              slug: p.slug,
+              name: p.name,
+              saleType: p.saleType,
+              stock: p.stock,
+              published: p.published,
+              featured: p.featured,
+              imageUrl: parseImages(p.images)[0] ?? null,
+            }}
+          />
+        ))}
+      </div>
 
       {products.length === 0 && (
         <p style={{ marginTop: "1rem", color: "#6b6560" }}>
@@ -71,11 +51,6 @@ export default async function AdminProductsPage() {
           해 주세요.
         </p>
       )}
-
-      <p style={{ marginTop: "1rem", fontSize: "0.85rem", color: "#6b6560" }}>
-        표시 가격: 참고용 · 실제 수정은 각 행의 입력 후 저장
-        {products[0] ? ` (예: ${formatPrice(products[0].price)})` : ""}
-      </p>
     </div>
   );
 }

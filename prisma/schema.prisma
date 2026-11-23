@@ -26,6 +26,9 @@ model Product {
   name        String
   slug        String   @unique
   description String
+  runieNote   String   @default("") // legacy; prefer detailHtml
+  detailHtml  String   @default("") // PDP 커스텀 상세 HTML
+  detailCss   String   @default("") // PDP 커스텀 상세 CSS
   price       Int
   stock       Int      @default(0)
   images      String // JSON array of image paths

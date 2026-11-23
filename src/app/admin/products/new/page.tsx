@@ -24,6 +24,8 @@ export default async function AdminNewProductPage() {
           name: "",
           slug: "",
           description: "",
+          detailHtml: "",
+          detailCss: "",
           price: 0,
           stock: 0,
           images: [],

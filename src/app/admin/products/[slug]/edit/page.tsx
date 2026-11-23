@@ -35,6 +35,8 @@ export default async function AdminEditProductPage({ params }: Props) {
           name: product.name,
           slug: product.slug,
           description: product.description,
+          detailHtml: product.detailHtml,
+          detailCss: product.detailCss,
           price: product.price,
           stock: product.stock,
           images,

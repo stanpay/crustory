@@ -4,11 +4,10 @@ import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatPrice, parseImages } from "@/lib/format";
-import { runieNote } from "@/lib/runie-notes";
 import { ProductInquiry } from "@/components/shop/ProductInquiry";
 import { DetailTabs } from "@/components/shop/DetailTabs";
 import { ProductCard } from "@/components/shop/ProductCard";
-import { Runie } from "@/components/brand/Runie";
+import { ProductCustomDetail } from "@/components/shop/ProductCustomDetail";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -107,15 +106,7 @@ export default async function ProductDetailPage({ params }: Props) {
         </div>
       </div>
 
-      <section className="note-band" aria-label="러니의 한마디">
-        <div className="wrap note-band__inner">
-          <Runie className="note-band__runie" title="" />
-          <blockquote>
-            “{runieNote(product.slug)}”
-            <cite>— 러니, 은퇴한 제주 경주마</cite>
-          </blockquote>
-        </div>
-      </section>
+      <ProductCustomDetail html={product.detailHtml} css={product.detailCss} />
 
       {related.length > 0 && (
         <section className="wrap block">

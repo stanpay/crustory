@@ -37,7 +37,7 @@ export async function rotateImageSrc(
         resolve(URL.createObjectURL(blob));
       },
       "image/jpeg",
-      0.95,
+      0.97,
     );
   });
 }
@@ -47,7 +47,7 @@ export async function getCroppedImageBlob(
   image: HTMLImageElement,
   crop: PixelCrop,
   mimeType: "image/jpeg" | "image/png" | "image/webp" = "image/jpeg",
-  quality = 0.92,
+  quality = 0.97,
 ): Promise<Blob> {
   if (!crop.width || !crop.height) {
     throw new Error("자를 영역을 선택해 주세요.");

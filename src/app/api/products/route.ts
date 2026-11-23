@@ -27,6 +27,8 @@ const createSchema = z.object({
   name: z.string().min(1),
   slug: z.string().min(1),
   description: z.string().min(1),
+  detailHtml: z.string().default(""),
+  detailCss: z.string().default(""),
   price: z.number().int().nonnegative(),
   stock: z.number().int().nonnegative(),
   images: z.array(z.string()).default([]),
