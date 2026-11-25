@@ -47,7 +47,7 @@ URL의 경로만 `/postgres` ↔ `/crustory_dev`로 바꾸면 됩니다.
 | `KAKAO_REST_API_KEY` | 카카오 REST API 키 |
 | `KAKAO_CLIENT_SECRET` | (선택) 카카오 Client Secret — 보안 설정에서 사용 시 |
 | `NEXT_PUBLIC_SITE_URL` | 사이트 URL (로컬 `http://localhost:3000`, 배포 시 Vercel URL) |
-| `NEXT_PUBLIC_GA_ID` | (선택) GA 측정 ID |
+| `NEXT_PUBLIC_GTM_ID` | (선택) Google Tag Manager 컨테이너 ID (예: `GTM-XXXX`) |
 | `FIREBASE_SERVICE_ACCOUNT_JSON` | (앱 푸시) Firebase 서비스 계정 JSON 문자열 |
 
 ### 카카오 로그인
