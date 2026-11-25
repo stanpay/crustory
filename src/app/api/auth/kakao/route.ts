@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import { attachKakaoOAuthState } from "@/lib/customer-auth";
+import { getSiteUrl } from "@/lib/env";
 import { buildKakaoAuthorizeUrl } from "@/lib/kakao";
 
 function safeNextPath(raw: string | null) {
@@ -10,7 +11,7 @@ function safeNextPath(raw: string | null) {
 }
 
 export async function GET(req: Request) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const siteUrl = getSiteUrl(req);
   try {
     const url = new URL(req.url);
     const next = safeNextPath(url.searchParams.get("next"));
@@ -18,7 +19,7 @@ export async function GET(req: Request) {
       url.searchParams.get("app") === "1" ||
       /CrustoryApp|capacitor/i.test(req.headers.get("user-agent") || "");
     const stateToken = randomBytes(16).toString("hex");
-    const authorizeUrl = buildKakaoAuthorizeUrl(stateToken);
+    const authorizeUrl = buildKakaoAuthorizeUrl(stateToken, siteUrl);
     const res = NextResponse.redirect(authorizeUrl);
     attachKakaoOAuthState(res, stateToken, next, fromApp);
     return res;

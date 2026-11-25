@@ -84,6 +84,7 @@ export function AdminShell({
         </div>
         <p className="admin-nav__email">{email}</p>
         <Link href="/admin">대시보드</Link>
+        <Link href="/admin/visitors">방문객</Link>
         <Link href="/admin/products">상품</Link>
         <Link href="/admin/orders">주문</Link>
         <Link href="/admin/members">회원</Link>

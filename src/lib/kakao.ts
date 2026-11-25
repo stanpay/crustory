@@ -1,21 +1,23 @@
+import { getSiteUrl } from "@/lib/env";
+
 const KAKAO_AUTH = "https://kauth.kakao.com";
 const KAKAO_API = "https://kapi.kakao.com";
 
-export function getKakaoConfig() {
+export function getKakaoConfig(siteUrl = getSiteUrl()) {
   const restApiKey = process.env.KAKAO_REST_API_KEY;
   const clientSecret = process.env.KAKAO_CLIENT_SECRET;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  const redirectUri = `${siteUrl.replace(/\/$/, "")}/api/auth/kakao/callback`;
+  const origin = siteUrl.replace(/\/$/, "");
+  const redirectUri = `${origin}/api/auth/kakao/callback`;
 
   if (!restApiKey) {
     throw new Error("KAKAO_REST_API_KEY is not configured");
   }
 
-  return { restApiKey, clientSecret, redirectUri, siteUrl };
+  return { restApiKey, clientSecret, redirectUri, siteUrl: origin };
 }
 
-export function buildKakaoAuthorizeUrl(state: string) {
-  const { restApiKey, redirectUri } = getKakaoConfig();
+export function buildKakaoAuthorizeUrl(state: string, siteUrl?: string) {
+  const { restApiKey, redirectUri } = getKakaoConfig(siteUrl);
   const params = new URLSearchParams({
     client_id: restApiKey,
     redirect_uri: redirectUri,
@@ -33,8 +35,11 @@ type KakaoTokenResponse = {
   scope?: string;
 };
 
-export async function exchangeKakaoCode(code: string): Promise<KakaoTokenResponse> {
-  const { restApiKey, clientSecret, redirectUri } = getKakaoConfig();
+export async function exchangeKakaoCode(
+  code: string,
+  siteUrl?: string,
+): Promise<KakaoTokenResponse> {
+  const { restApiKey, clientSecret, redirectUri } = getKakaoConfig(siteUrl);
   const body = new URLSearchParams({
     grant_type: "authorization_code",
     client_id: restApiKey,

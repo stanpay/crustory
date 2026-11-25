@@ -46,19 +46,27 @@ URL의 경로만 `/postgres` ↔ `/crustory_dev`로 바꾸면 됩니다.
 | `CUSTOMER_SESSION_SECRET` | 회원 세션 서명 시크릿 |
 | `KAKAO_REST_API_KEY` | 카카오 REST API 키 |
 | `KAKAO_CLIENT_SECRET` | (선택) 카카오 Client Secret — 보안 설정에서 사용 시 |
-| `NEXT_PUBLIC_SITE_URL` | 사이트 URL (로컬 `http://localhost:3000`, 배포 시 Vercel URL) |
+| `NEXT_PUBLIC_SITE_URL` | 사이트 URL (로컬 `http://localhost:3000`). 런타임은 요청 Host를 우선하므로 커스텀 도메인/Preview에서도 맞음 |
 | `NEXT_PUBLIC_GTM_ID` | (선택) Google Tag Manager 컨테이너 ID (예: `GTM-XXXX`) |
+| `GA4_PROPERTY_ID` | (관리자 방문객) GA4 속성 ID (숫자) |
+| `GA_SERVICE_ACCOUNT_JSON` | (선택) GA Data API용 서비스 계정 JSON — 없으면 `FIREBASE_SERVICE_ACCOUNT_JSON` 사용 |
 | `FIREBASE_SERVICE_ACCOUNT_JSON` | (앱 푸시) Firebase 서비스 계정 JSON 문자열 |
 
 ### 카카오 로그인
 
 1. [카카오 개발자](https://developers.kakao.com)에서 앱 생성
-2. **플랫폼**에 사이트 도메인 등록
-3. **Redirect URI**: `{NEXT_PUBLIC_SITE_URL}/api/auth/kakao/callback`
+2. **플랫폼**에 사이트 도메인 등록 (`crustory.co.kr`, Preview/로컬 도메인)
+3. **Redirect URI** (환경별로 모두 등록):
+   - Production: `https://crustory.co.kr/api/auth/kakao/callback`
+   - Preview(dev): `https://<dev-branch-url>/api/auth/kakao/callback`
+   - Local: `http://localhost:3000/api/auth/kakao/callback`
 4. Android 앱 복귀는 `crustory://auth/callback` 딥링크
 5. REST API 키를 `.env`의 `KAKAO_REST_API_KEY`에 넣기
 
-Vercel Production의 `NEXT_PUBLIC_SITE_URL`은 `https://crustory.vercel.app`으로 둡니다.  
+Vercel 환경변수:
+- **Production** `NEXT_PUBLIC_SITE_URL` = `https://crustory.co.kr`
+- **Preview** `NEXT_PUBLIC_SITE_URL` = Preview(dev) 고정 URL (또는 비우고 요청 Host 사용)
+
 시크릿 키에 `NEXT_PUBLIC_` 접두어를 붙이지 마세요.
 
 ## 관리자
@@ -68,6 +76,8 @@ Vercel Production의 `NEXT_PUBLIC_SITE_URL`은 `https://crustory.vercel.app`으�
 - 등록: 사이트 카카오 로그인 후 `Customer.kakaoId` 확인 → Table Editor/`AdminUser`에 insert
 
 상품 공개 여부·재고 등을 관리할 수 있습니다.
+
+방문객(`/admin/visitors`)은 GA4 Data API를 사용합니다. Google Cloud에서 Analytics Data API를 켠 뒤, 서비스 계정 이메일을 GA4 속성에 뷰어로 추가하고 `GA4_PROPERTY_ID`·서비스 계정 JSON을 넣으면 됩니다.
 
 ## 주요 경로
 
@@ -82,6 +92,7 @@ Vercel Production의 `NEXT_PUBLIC_SITE_URL`은 `https://crustory.vercel.app`으�
 | `/login` | 카카오 로그인 |
 | `/account` | 회원탈퇴 |
 | `/admin` | 관리자 (웹) |
+| `/admin/visitors` | GA4 방문 통계 |
 
 ## Android 앱
 

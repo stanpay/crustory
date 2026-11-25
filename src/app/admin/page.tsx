@@ -74,8 +74,9 @@ export default async function AdminDashboardPage() {
       </div>
 
       <div style={{ marginTop: "2rem", display: "flex", flexWrap: "wrap", gap: "0.75rem" }}>
-        <Link href="/admin/products" className="btn btn-dark">상품 관리</Link>
-        <Link href="/admin/orders" className="btn btn-primary">주문 관리</Link>
+        <Link href="/admin/visitors" className="btn btn-dark">방문객</Link>
+        <Link href="/admin/products" className="btn btn-primary">상품 관리</Link>
+        <Link href="/admin/orders" className="btn btn-ghost">주문 관리</Link>
         <Link href="/admin/members" className="btn btn-ghost">회원 관리</Link>
         <Link href="/admin/notices" className="btn btn-ghost">공지 관리</Link>
       </div>

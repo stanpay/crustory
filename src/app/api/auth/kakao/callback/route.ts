@@ -10,23 +10,17 @@ import {
   consumeKakaoOAuthState,
   createCustomerSessionToken,
 } from "@/lib/customer-auth";
+import { getSiteUrl } from "@/lib/env";
 import { exchangeKakaoCode, fetchKakaoProfile } from "@/lib/kakao";
-
-function siteBase() {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(
-    /\/$/,
-    "",
-  );
-}
 
 function isAdminNext(path: string) {
   return path === "/admin" || path.startsWith("/admin/");
 }
 
-function redirectWithError(message: string, admin = false) {
+function redirectWithError(siteBase: string, message: string, admin = false) {
   const dest = admin ? "/admin/login" : "/login";
   return NextResponse.redirect(
-    `${siteBase()}${dest}?error=${encodeURIComponent(message)}`,
+    `${siteBase}${dest}?error=${encodeURIComponent(message)}`,
   );
 }
 
@@ -38,6 +32,7 @@ function safeNextPath(raw: string) {
 }
 
 export async function GET(req: Request) {
+  const siteBase = getSiteUrl(req);
   let adminAttempt = false;
   try {
     const url = new URL(req.url);
@@ -46,10 +41,10 @@ export async function GET(req: Request) {
     const error = url.searchParams.get("error");
 
     if (error) {
-      return redirectWithError("카카오 로그인이 취소되었습니다.");
+      return redirectWithError(siteBase, "카카오 로그인이 취소되었습니다.");
     }
     if (!code || !state) {
-      return redirectWithError("잘못된 로그인 요청입니다.");
+      return redirectWithError(siteBase, "잘못된 로그인 요청입니다.");
     }
 
     const { ok, nextPath, fromApp } = await consumeKakaoOAuthState(state);
@@ -58,24 +53,26 @@ export async function GET(req: Request) {
 
     if (!ok) {
       return redirectWithError(
+        siteBase,
         "로그인 세션이 만료되었습니다. 다시 시도해 주세요.",
         adminAttempt,
       );
     }
 
-    const token = await exchangeKakaoCode(code);
+    const token = await exchangeKakaoCode(code, siteBase);
     const profile = await fetchKakaoProfile(token.access_token);
 
     if (adminAttempt) {
       const admin = await resolveAdminFromKakao(profile);
       if (!admin) {
         return redirectWithError(
+          siteBase,
           "관리자로 등록된 카카오 계정이 아닙니다.",
           true,
         );
       }
       const sessionToken = await createAdminSessionToken(admin);
-      const res = NextResponse.redirect(`${siteBase()}${safeNext}`);
+      const res = NextResponse.redirect(`${siteBase}${safeNext}`);
       attachAdminSession(res, sessionToken);
       return res;
     }
@@ -105,11 +102,15 @@ export async function GET(req: Request) {
       return NextResponse.redirect(deeplink);
     }
 
-    const res = NextResponse.redirect(`${siteBase()}${safeNext}`);
+    const res = NextResponse.redirect(`${siteBase}${safeNext}`);
     attachCustomerSession(res, sessionToken);
     return res;
   } catch (e) {
     console.error(e);
-    return redirectWithError("카카오 로그인에 실패했습니다.", adminAttempt);
+    return redirectWithError(
+      siteBase,
+      "카카오 로그인에 실패했습니다.",
+      adminAttempt,
+    );
   }
 }
