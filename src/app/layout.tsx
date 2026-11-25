@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
 import { Gowun_Batang } from "next/font/google";
+import { cookies, headers } from "next/headers";
 import { Analytics } from "@/components/Analytics";
 import { DevSiteBanner } from "@/components/layout/DevSiteBanner";
 import { SiteChrome } from "@/components/layout/SiteChrome";
 import { NativeAppBootstrap } from "@/components/native/NativeAppBootstrap";
 import { getCustomerSession } from "@/lib/customer-auth";
 import { isDevSite } from "@/lib/env";
+import {
+  LOCALE_COOKIE,
+  isLocale,
+  parseAcceptLanguage,
+  type Locale,
+} from "@/lib/i18n";
 import { prisma } from "@/lib/prisma";
 import "./globals.css";
 
@@ -46,6 +53,15 @@ export const metadata: Metadata = {
   },
 };
 
+async function resolveInitialLocale(): Promise<Locale> {
+  const cookieStore = await cookies();
+  const fromCookie = cookieStore.get(LOCALE_COOKIE)?.value;
+  if (isLocale(fromCookie)) return fromCookie;
+
+  const headerStore = await headers();
+  return parseAcceptLanguage(headerStore.get("accept-language"));
+}
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -54,6 +70,7 @@ export default async function RootLayout({
   const customer = await getCustomerSession();
   const initialLoggedIn = Boolean(customer?.id);
   const initialUserName = customer?.name || customer?.email || (initialLoggedIn ? "회원" : null);
+  const initialLocale = await resolveInitialLocale();
 
   const activeNotice = await prisma.notice.findFirst({
     where: { active: true },
@@ -62,7 +79,7 @@ export default async function RootLayout({
   });
 
   return (
-    <html lang="ko" className={gowun.variable}>
+    <html lang={initialLocale} className={gowun.variable}>
       <head>
         <link
           rel="stylesheet"
@@ -77,6 +94,7 @@ export default async function RootLayout({
         <SiteChrome
           initialLoggedIn={initialLoggedIn}
           initialUserName={initialUserName}
+          initialLocale={initialLocale}
           announcement={activeNotice}
         >
           {children}

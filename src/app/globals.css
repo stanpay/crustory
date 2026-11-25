@@ -289,7 +289,8 @@ a.wordmark {
 }
 
 .hd__util a:hover,
-.hd__auth-btn:hover:not(:disabled) {
+.hd__auth-btn:hover:not(:disabled),
+.hd__lang-btn:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -311,6 +312,86 @@ a.wordmark {
 .hd__auth-btn:disabled {
   opacity: 0.55;
   cursor: wait;
+}
+
+.hd__lang {
+  position: relative;
+}
+
+.hd__lang-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.hd__lang-caret {
+  font-size: 9px;
+  line-height: 1;
+  opacity: 0.55;
+  transform: translateY(-0.5px);
+}
+
+.hd__lang.is-open .hd__lang-caret {
+  transform: translateY(-0.5px) rotate(180deg);
+}
+
+.hd__lang-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 40;
+  min-width: 148px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--ink) 10%, transparent);
+}
+
+.hd__lang-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hd__lang-option:hover,
+.hd__lang-option.is-active {
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+}
+
+.hd__lang-option-code {
+  width: 1.6em;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
+}
+
+.hd__lang-option.is-active .hd__lang-option-code {
+  opacity: 1;
 }
 
 .hd__util .hide-sm {

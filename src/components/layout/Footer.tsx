@@ -1,7 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import { Runie } from "@/components/brand/Runie";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 export function Footer() {
+  const t = useT();
+
   return (
     <footer className="ft">
       <div className="wrap">
@@ -13,28 +18,28 @@ export function Footer() {
             <p>
               For solo travelers, from Jeju.
               <br />
-              혼자 온 여행을, 더 잘 즐길 수 있도록.
+              {t("ftTagline")}
             </p>
           </div>
           <div>
-            <h2>둘러보기</h2>
+            <h2>{t("ftExplore")}</h2>
             <ul>
-              <li><Link href="/shop">Shop</Link></li>
-              <li><Link href="/meet-runie">Meet Runie</Link></li>
-              <li><Link href="/our-story">Our Story</Link></li>
-              <li><Link href="/pizza">Pizza</Link></li>
+              <li><Link href="/shop">{t("navShop")}</Link></li>
+              <li><Link href="/meet-runie">{t("navMeetRunie")}</Link></li>
+              <li><Link href="/our-story">{t("navOurStory")}</Link></li>
+              <li><Link href="/pizza">{t("navPizza")}</Link></li>
             </ul>
           </div>
           <div>
-            <h2>고객 지원</h2>
+            <h2>{t("ftSupport")}</h2>
             <ul>
-              <li><Link href="/contact">문의하기</Link></li>
-              <li><Link href="/account">계정</Link></li>
-              <li><Link href="/policies/guide">이용안내</Link></li>
+              <li><Link href="/contact">{t("contactUs")}</Link></li>
+              <li><Link href="/account">{t("account")}</Link></li>
+              <li><Link href="/policies/guide">{t("guide")}</Link></li>
             </ul>
           </div>
           <div>
-            <h2>소식</h2>
+            <h2>{t("ftNews")}</h2>
             <ul>
               <li>
                 <a href="https://www.instagram.com/crustory_jeju/" target="_blank" rel="noreferrer">
@@ -47,10 +52,10 @@ export function Footer() {
         <div className="ft__legal">
           <span>© {new Date().getFullYear()} CRUSTORY</span>
           <span>
-            <Link href="/policies/terms">이용약관</Link>
+            <Link href="/policies/terms">{t("terms")}</Link>
             {" · "}
             <Link href="/policies/privacy">
-              <b>개인정보처리방침</b>
+              <b>{t("privacy")}</b>
             </Link>
           </span>
         </div>

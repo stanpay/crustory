@@ -86,6 +86,7 @@ export function AdminShell({
         <Link href="/admin">대시보드</Link>
         <Link href="/admin/products">상품</Link>
         <Link href="/admin/orders">주문</Link>
+        <Link href="/admin/members">회원</Link>
         <Link href="/admin/notices">공지</Link>
         <Link href="/">사이트로</Link>
         <div className="admin-nav__logout">

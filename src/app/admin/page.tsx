@@ -7,6 +7,7 @@ import { formatPrice } from "@/lib/format";
 type DashboardRow = {
   productCount: number;
   orderCount: number;
+  memberCount: number;
   paidSum: number;
   recentOrders: Array<{
     id: string;
@@ -26,6 +27,7 @@ export default async function AdminDashboardPage() {
     SELECT
       (SELECT COUNT(*)::int FROM "Product") AS "productCount",
       (SELECT COUNT(*)::int FROM "Order") AS "orderCount",
+      (SELECT COUNT(*)::int FROM "Customer") AS "memberCount",
       (SELECT COALESCE(SUM(amount), 0)::int FROM "Order" WHERE status = 'PAID') AS "paidSum",
       (
         SELECT COALESCE(json_agg(row_to_json(r)), '[]'::json)
@@ -40,6 +42,7 @@ export default async function AdminDashboardPage() {
 
   const productCount = row?.productCount ?? 0;
   const orderCount = row?.orderCount ?? 0;
+  const memberCount = row?.memberCount ?? 0;
   const paidTotal = row?.paidSum ?? 0;
   const recentOrders = (row?.recentOrders ?? []).map((o) => ({
     ...o,
@@ -59,6 +62,10 @@ export default async function AdminDashboardPage() {
           <p style={{ fontSize: "1.75rem", fontWeight: 800, color: "#111" }}>{orderCount}</p>
         </article>
         <article className="value-card">
+          <h3>회원</h3>
+          <p style={{ fontSize: "1.75rem", fontWeight: 800, color: "#111" }}>{memberCount}</p>
+        </article>
+        <article className="value-card">
           <h3>확정 주문 합계</h3>
           <p style={{ fontSize: "1.25rem", fontWeight: 800, color: "#111" }}>
             {formatPrice(paidTotal)}
@@ -69,6 +76,7 @@ export default async function AdminDashboardPage() {
       <div style={{ marginTop: "2rem", display: "flex", flexWrap: "wrap", gap: "0.75rem" }}>
         <Link href="/admin/products" className="btn btn-dark">상품 관리</Link>
         <Link href="/admin/orders" className="btn btn-primary">주문 관리</Link>
+        <Link href="/admin/members" className="btn btn-ghost">회원 관리</Link>
         <Link href="/admin/notices" className="btn btn-ghost">공지 관리</Link>
       </div>
 

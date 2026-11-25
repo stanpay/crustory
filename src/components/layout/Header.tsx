@@ -2,24 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RunieEyes } from "@/components/brand/Runie";
-
-const nav = [
-  { href: "/shop", label: "Shop" },
-  { href: "/meet-runie", label: "Meet Runie" },
-  { href: "/our-story", label: "Our Story" },
-  { href: "/pizza", label: "Pizza" },
-  { href: "/jeju-guide", label: "Jeju Guide" },
-];
-
-const menu = [
-  { href: "/shop", label: "Shop", note: "러니 굿즈" },
-  { href: "/meet-runie", label: "Meet Runie", note: "7연승 후 은퇴한 경주마" },
-  { href: "/our-story", label: "Our Story", note: "혼행객 120명의 이야기에서" },
-  { href: "/pizza", label: "Pizza", note: "8인치, 혼자 먹기 좋은 크기" },
-  { href: "/jeju-guide", label: "Jeju Guide", note: "준비 중" },
-];
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { useT } from "@/components/i18n/LocaleProvider";
 
 type HeaderProps = {
   initialLoggedIn?: boolean;
@@ -32,11 +18,34 @@ export function Header({
 }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [loggedIn, setLoggedIn] = useState(initialLoggedIn);
   const [userName, setUserName] = useState<string | null>(initialUserName);
   const [loggingOut, setLoggingOut] = useState(false);
+
+  const nav = useMemo(
+    () => [
+      { href: "/shop", label: t("navShop") },
+      { href: "/meet-runie", label: t("navMeetRunie") },
+      { href: "/our-story", label: t("navOurStory") },
+      { href: "/pizza", label: t("navPizza") },
+      { href: "/jeju-guide", label: t("navJejuGuide") },
+    ],
+    [t],
+  );
+
+  const menu = useMemo(
+    () => [
+      { href: "/shop", label: t("navShop"), note: t("noteShop") },
+      { href: "/meet-runie", label: t("navMeetRunie"), note: t("noteMeetRunie") },
+      { href: "/our-story", label: t("navOurStory"), note: t("noteOurStory") },
+      { href: "/pizza", label: t("navPizza"), note: t("notePizza") },
+      { href: "/jeju-guide", label: t("navJejuGuide"), note: t("noteJejuGuide") },
+    ],
+    [t],
+  );
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -54,7 +63,7 @@ export function Header({
         if (cancelled) return;
         if (data.user?.id) {
           setLoggedIn(true);
-          setUserName(data.user.name || data.user.email || "회원");
+          setUserName(data.user.name || data.user.email || t("member"));
         } else {
           setLoggedIn(false);
           setUserName(null);
@@ -70,7 +79,7 @@ export function Header({
     return () => {
       cancelled = true;
     };
-  }, [pathname]);
+  }, [pathname, t]);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -111,8 +120,8 @@ export function Header({
           onClick={() => setOpen(true)}
         >
           <RunieEyes />
-          <span>Menu</span>
-          <em className="sr-only">메뉴 열기</em>
+          <span>{t("menu")}</span>
+          <em className="sr-only">{t("openMenu")}</em>
         </button>
 
         <Link href="/" className="wordmark" aria-label="crustory 홈">
@@ -120,6 +129,7 @@ export function Header({
         </Link>
 
         <div className="hd__util">
+          <LanguageSwitcher />
           {loggedIn ? (
             <button
               type="button"
@@ -127,20 +137,20 @@ export function Header({
               onClick={handleLogout}
               disabled={loggingOut}
             >
-              {loggingOut ? "…" : "로그아웃"}
+              {loggingOut ? "…" : t("logout")}
             </button>
           ) : (
             <Link href="/login" className="hd__auth-btn">
-              로그인
+              {t("login")}
             </Link>
           )}
           <Link href="/contact" className="hide-sm">
-            문의
+            {t("contact")}
           </Link>
         </div>
       </div>
 
-      <nav className="hd__nav" aria-label="주요 메뉴">
+      <nav className="hd__nav" aria-label={t("mainNav")}>
         {nav.map((link) => (
           <Link
             key={link.href}
@@ -153,7 +163,7 @@ export function Header({
       </nav>
 
       {open && (
-        <div className="menu" id="site-menu" role="dialog" aria-modal="true" aria-label="메뉴">
+        <div className="menu" id="site-menu" role="dialog" aria-modal="true" aria-label={t("menu")}>
           <div className="menu__top">
             <Link href="/" className="wordmark" onClick={() => setOpen(false)} aria-label="crustory 홈">
               crustory
@@ -161,7 +171,7 @@ export function Header({
             <button
               type="button"
               className="menu__close"
-              aria-label="메뉴 닫기"
+              aria-label={t("closeMenu")}
               onClick={() => setOpen(false)}
               autoFocus
             >
@@ -182,7 +192,7 @@ export function Header({
             {loggedIn ? (
               <>
                 <Link href="/account" onClick={() => setOpen(false)}>
-                  {userName || "회원"} · 계정
+                  {userName || t("member")} · {t("account")}
                 </Link>
                 <button
                   type="button"
@@ -190,19 +200,19 @@ export function Header({
                   onClick={handleLogout}
                   disabled={loggingOut}
                 >
-                  {loggingOut ? "…" : "로그아웃"}
+                  {loggingOut ? "…" : t("logout")}
                 </button>
               </>
             ) : (
               <Link href="/login" onClick={() => setOpen(false)}>
-                카카오 로그인
+                {t("kakaoLogin")}
               </Link>
             )}
             <Link href="/contact" onClick={() => setOpen(false)}>
-              문의하기
+              {t("contactUs")}
             </Link>
             <Link href="/policies/guide" onClick={() => setOpen(false)}>
-              이용안내
+              {t("guide")}
             </Link>
             <a href="https://www.instagram.com/crustory_jeju/" target="_blank" rel="noreferrer">
               Instagram
